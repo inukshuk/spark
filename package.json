@@ -1,0 +1,34 @@
+{
+  "name": "spark",
+  "version": "1.0.0",
+  "description": "The Electron test runner",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "spark": "./bin/spark"
+  },
+  "scripts": {
+    "lint": "standard",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inukshuk/spark.git"
+  },
+  "keywords": [
+    "electron",
+    "test",
+    "testing",
+    "coverage"
+  ],
+  "author": "Sylvester Keil <sylvester@keil.or.at>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/inukshuk/spark/issues"
+  },
+  "homepage": "https://github.com/inukshuk/spark#readme",
+  "devDependencies": {
+    "eslint": "^9.5.0",
+    "neostandard": "^0.9.0"
+  }
+}
