@@ -2,13 +2,13 @@
   "name": "spark",
   "version": "1.0.0",
   "description": "The Electron test runner",
-  "main": "index.js",
+  "main": "lib/main.js",
   "type": "module",
   "bin": {
-    "spark": "./bin/spark"
+    "spark": "./bin/spark.js"
   },
   "scripts": {
-    "lint": "standard",
+    "lint": "eslint bin lib test",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,7 +28,8 @@
   },
   "homepage": "https://github.com/inukshuk/spark#readme",
   "devDependencies": {
+    "electron": "^41.0.2",
     "eslint": "^9.5.0",
-    "neostandard": "^0.9.0"
+    "neostandard": "^0.13.0"
   }
 }
