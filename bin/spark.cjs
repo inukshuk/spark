@@ -32,7 +32,6 @@ function run (electron) {
 
     child.stdout.pipe(process.stdout)
     child.stderr.pipe(process.stderr)
-    process.stdin.pipe(child.stdin)
 
     child.on('exit', (code, signal) => {
       if (signal)
