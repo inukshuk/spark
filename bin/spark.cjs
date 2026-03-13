@@ -18,8 +18,8 @@ function resolve (module, resolver = require) {
 function run (electron) {
   if (!electron) {
     console.error(`
-    Cannot find 'electron' and $ELECTRON_PATH is not set.
-    Either set $ELECTRON_PATH or run 'npm install electron'.`)
+      Cannot find 'electron' and $ELECTRON_PATH is not set.
+      Either set $ELECTRON_PATH or run 'npm install electron'.`)
 
     process.exit(1)
   } else {
