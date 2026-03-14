@@ -10,7 +10,8 @@
   "scripts": {
     "lint": "eslint --fix eslint.config.js bin lib test",
     "pretest": "eslint eslint.config.js bin lib test",
-    "test": "electron . 'test/main/**/*_test.js' -r 'test/renderer/**/*_test.js'"
+    "test": "electron . 'test/main/**/*_test.js' -r 'test/renderer/**/*_test.js'",
+    "test:cli": "node --test test/cli_test.js"
   },
   "repository": {
     "type": "git",
