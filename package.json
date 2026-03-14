@@ -8,8 +8,9 @@
     "spark": "./bin/spark.cjs"
   },
   "scripts": {
-    "lint": "eslint bin lib test",
-    "test": "spark"
+    "lint": "eslint --fix eslint.config.js bin lib test",
+    "pretest": "eslint eslint.config.js bin lib test",
+    "test": "electron . 'test/main/**/*_test.js' -r 'test/renderer/**/*_test.js'"
   },
   "repository": {
     "type": "git",
