@@ -29,6 +29,15 @@
     "url": "https://github.com/inukshuk/spark/issues"
   },
   "homepage": "https://github.com/inukshuk/spark#readme",
+  "engines": {
+    "node": ">=24"
+  },
+  "peerDependencies": {
+    "electron": ">=40"
+  },
+  "peerDependenciesMeta": {
+    "electron": { "optional": true }
+  },
   "devDependencies": {
     "electron": "^41.0.2",
     "eslint": "^9.5.0",
