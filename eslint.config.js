@@ -8,7 +8,7 @@ export default standard({
 }).concat([
   {
     rules: {
-      curly: [1, 'multi-or-nest'],
+      curly: 0,
       'no-var': 0,
       'prefer-const': 0,
       '@stylistic/comma-dangle': 0,
