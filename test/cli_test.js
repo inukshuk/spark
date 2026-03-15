@@ -1,10 +1,13 @@
 import assert from 'node:assert'
 import { execFile } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { pkg } from '../lib/args.js'
 
 let bin = join(import.meta.dirname, '../bin/spark.cjs')
+let { version } = JSON.parse(
+  readFileSync(join(import.meta.dirname, '../package.json'), 'utf-8')
+)
 
 function spark (args) {
   return new Promise((resolve, reject) => {
@@ -17,7 +20,6 @@ function spark (args) {
 
 test('--version', async () => {
   let { code, stdout } = await spark(['--version'])
-  let { version } = pkg()
   assert.equal(code, 0)
   assert.match(stdout.trim(), new RegExp(`^${version} \\(.+\\)$`))
 })
