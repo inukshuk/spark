@@ -24,7 +24,7 @@ function run (electron) {
     process.exit(1)
   } else {
     let args = [
-      join(__dirname, '../lib/main.js'),
+      join(__dirname, '..'),
       ...process.argv.slice(2)
     ]
 
