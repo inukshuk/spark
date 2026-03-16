@@ -22,13 +22,21 @@ jobs:
       - name: Install Electron 
         run: npm install --save-dev electron@${{ matrix.electron }}
 
-      - name: Run Tests (Linux)
+      - name: Run test:spark
         if: runner.os == 'Linux'
-        run: xvfb-run npm test
+        run: xvfb-run npm run test:spark -- --verbose --reporter tap
 
-      - name: Run Tests
+      - name: Run test:spark
         if: runner.os != 'Linux'
-        run: npm test
+        run: npm run test:spark -- --verbose --reporter tap
+
+      - name: Run test:node
+        if: runner.os == 'Linux'
+        run: xvfb-run npm run test:node -- --test-reporter=tap
+
+      - name: Run test:node
+        if: runner.os != 'Linux'
+        run: npm run test:node -- --test-reporter=tap
 
   lint:
     runs-on: ubuntu-latest

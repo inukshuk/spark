@@ -9,9 +9,9 @@
   },
   "scripts": {
     "lint": "eslint eslint.config.js bin lib test",
-    "test": "npm run test:unit && npm run test:cli",
-    "test:unit": "electron --no-sandbox . test/main/**/*.test.js -r test/renderer/**/*.test.js",
-    "test:cli": "node --test test/cli.test.js"
+    "test": "npm run test:spark && npm run test:node",
+    "test:spark": "electron --no-sandbox . test/main/**/*.test.js -r test/renderer/**/*.test.js",
+    "test:node": "node --test test/cli.test.js"
   },
   "repository": {
     "type": "git",
