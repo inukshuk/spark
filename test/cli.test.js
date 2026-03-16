@@ -14,7 +14,7 @@ let sandbox = process.platform === 'linux' ? ['--no-sandbox'] : []
 
 function spark (args) {
   return new Promise((resolve, reject) => {
-    execFile(bin, [...sandbox, ...args], (err, stdout, stderr) => {
+    execFile(process.execPath, [bin, ...sandbox, ...args], (err, stdout, stderr) => {
       if (err && !err.code) return reject(err)
       resolve({ code: err?.code ?? 0, stdout, stderr })
     })
