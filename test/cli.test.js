@@ -10,9 +10,11 @@ let { version } = JSON.parse(
   readFileSync(join(import.meta.dirname, '../package.json'), 'utf-8')
 )
 
+let sandbox = process.platform === 'linux' ? ['--no-sandbox'] : []
+
 function spark (args) {
   return new Promise((resolve, reject) => {
-    execFile(bin, args, (err, stdout, stderr) => {
+    execFile(bin, [...sandbox, ...args], (err, stdout, stderr) => {
       if (err && !err.code) return reject(err)
       resolve({ code: err?.code ?? 0, stdout, stderr })
     })
