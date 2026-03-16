@@ -80,22 +80,24 @@ test('--only', async () => {
   assert.doesNotMatch(stdout, /ok.*skipped/)
 })
 
-test('--ui bdd', async () => {
-  let { code, stdout } = await spark([
-    '--ui', 'bdd', '-R', 'tap', '-O', 'stdout', F.test('bdd')
-  ])
-  assert.equal(code, 0)
-  assert.match(stdout, /ok 1 - works/)
-  assert.match(stdout, /ok 2 - alias/)
-  assert.match(stdout, /ok 1 - also works/)
-})
+test('--ui', async (t) => {
+  await t.test('bdd', async () => {
+    let { code, stdout } = await spark([
+      '--ui', 'bdd', '-R', 'tap', '-O', 'stdout', F.test('bdd')
+    ])
+    assert.equal(code, 0)
+    assert.match(stdout, /ok 1 - works/)
+    assert.match(stdout, /ok 2 - alias/)
+    assert.match(stdout, /ok 1 - also works/)
+  })
 
-test('--ui tdd', async () => {
-  let { code, stdout } = await spark([
-    '--ui', 'tdd', '-R', 'tap', '-O', 'stdout', F.test('tdd')
-  ])
-  assert.equal(code, 0)
-  assert.match(stdout, /ok 1 - works/)
+  await t.test('tdd', async () => {
+    let { code, stdout } = await spark([
+      '--ui', 'tdd', '-R', 'tap', '-O', 'stdout', F.test('tdd')
+    ])
+    assert.equal(code, 0)
+    assert.match(stdout, /ok 1 - works/)
+  })
 })
 
 test('--global-setup', async (t) => {
