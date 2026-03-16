@@ -84,3 +84,8 @@ test('usage includes all flags', () => {
     assert.match(text, new RegExp(flag))
   }
 })
+
+test('unknown flags are ignored', () => {
+  let opts = argv('--no-sandbox', '--unknown-flag')
+  assert.equal(opts.main, undefined)
+})
