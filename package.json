@@ -9,7 +9,8 @@
   },
   "scripts": {
     "lint": "eslint eslint.config.js bin lib test",
-    "test": "electron --no-sandbox . test/main/**/*.test.js -r test/renderer/**/*.test.js",
+    "test": "npm run test:unit && npm run test:cli",
+    "test:unit": "electron --no-sandbox . test/main/**/*.test.js -r test/renderer/**/*.test.js",
     "test:cli": "node --test test/cli.test.js"
   },
   "repository": {
