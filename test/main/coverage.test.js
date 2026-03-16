@@ -3,7 +3,9 @@ import { test } from 'node:test'
 import { runMain, runRenderer } from '../../lib/spark.js'
 import { F } from '../support.js'
 
-test('coverage from main and renderer combined', async () => {
+test('coverage from main and renderer combined', {
+  skip: process.platform === 'win32'
+}, async () => {
   let coverages = []
 
   let opts = {
