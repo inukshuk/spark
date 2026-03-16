@@ -79,3 +79,21 @@ test('--only', async () => {
   assert.match(stdout, /ok 1 - executed/)
   assert.doesNotMatch(stdout, /ok.*skipped/)
 })
+
+test('--ui bdd', async () => {
+  let { code, stdout } = await spark([
+    '--ui', 'bdd', '-R', 'tap', '-O', 'stdout', F.test('bdd')
+  ])
+  assert.equal(code, 0)
+  assert.match(stdout, /ok 1 - works/)
+  assert.match(stdout, /ok 2 - alias/)
+  assert.match(stdout, /ok 1 - also works/)
+})
+
+test('--ui tdd', async () => {
+  let { code, stdout } = await spark([
+    '--ui', 'tdd', '-R', 'tap', '-O', 'stdout', F.test('tdd')
+  ])
+  assert.equal(code, 0)
+  assert.match(stdout, /ok 1 - works/)
+})
