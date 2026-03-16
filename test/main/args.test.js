@@ -86,6 +86,12 @@ test('--ui', () => {
   assert.equal(argv('--ui', 'tdd').ui, 'tdd')
 })
 
+test('--global-setup becomes globalSetupPath', () => {
+  let opts = argv('-S', 'setup.js')
+  assert.equal(opts.globalSetupPath, 'setup.js')
+  assert.equal(opts['global-setup'], undefined)
+})
+
 test('unknown flags collected in switches', () => {
   let opts = argv('--no-sandbox', '--unknown-flag')
   assert.deepStrictEqual(opts.switches, ['--no-sandbox', '--unknown-flag'])
