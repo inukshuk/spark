@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import { test } from 'node:test'
-import { parse, usage } from '../../lib/args.js'
+import { options, parse, usage } from '../../lib/args.js'
 
 function argv (...args) {
   return parse(args)
@@ -74,16 +74,16 @@ test('unknown reporter throws', () => {
   )
 })
 
-test('usage includes all flags', () => {
+test('usage documents all options', () => {
   let text = usage()
-  for (let flag of [
-    '--renderer', '--name-pattern', '--skip-pattern',
-    '--concurrency', '--isolation', '--timeout', '--only',
-    '--rerun-failures', '--reporter', '--destination',
-    '--verbose', '--help', '--version'
-  ]) {
-    assert.match(text, new RegExp(flag))
+  for (let name of Object.keys(options)) {
+    assert.match(text, new RegExp(`--${name}`))
   }
+})
+
+test('--ui', () => {
+  assert.equal(argv('--ui', 'bdd').ui, 'bdd')
+  assert.equal(argv('--ui', 'tdd').ui, 'tdd')
 })
 
 test('unknown flags collected in switches', () => {
