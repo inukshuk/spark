@@ -10,6 +10,7 @@ test('defaults', () => {
   let opts = argv()
   assert.deepStrictEqual(opts.reporter, ['spec'])
   assert.deepStrictEqual(opts.destination, ['stdout'])
+  assert.deepStrictEqual(opts.switches, [])
   assert.equal(opts.isolation, undefined)
   assert.equal(opts.main, undefined)
 })
@@ -85,7 +86,8 @@ test('usage includes all flags', () => {
   }
 })
 
-test('unknown flags are ignored', () => {
+test('unknown flags collected in switches', () => {
   let opts = argv('--no-sandbox', '--unknown-flag')
+  assert.deepStrictEqual(opts.switches, ['--no-sandbox', '--unknown-flag'])
   assert.equal(opts.main, undefined)
 })
