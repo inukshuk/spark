@@ -1,3 +1,4 @@
+import globals from 'globals'
 import standard from 'neostandard'
 
 export default standard({
@@ -13,6 +14,12 @@ export default standard({
       'prefer-const': 0,
       '@stylistic/comma-dangle': 0,
       '@stylistic/padded-blocks': 0
+    }
+  },
+  {
+    files: ['test/**/*.js'],
+    languageOptions: {
+      globals: globals.mocha
     }
   }
 ])
