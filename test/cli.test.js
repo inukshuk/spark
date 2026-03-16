@@ -18,7 +18,7 @@ function spark (args) {
   })
 }
 
-let fixture = 'test/fixtures/cli_test.js'
+let fixture = 'test/fixtures/cli.test.js'
 
 test('--version', async () => {
   let { code, stdout } = await spark(['--version'])
