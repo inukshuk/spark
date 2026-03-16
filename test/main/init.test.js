@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'node:assert/strict'
 import { tmpdir } from 'node:os'
 import { test } from 'node:test'
 import { app } from 'electron'

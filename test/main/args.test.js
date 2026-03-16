@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { options, parse, usage } from '../../lib/args.js'
 
@@ -8,16 +8,16 @@ function argv (...args) {
 
 test('defaults', () => {
   let opts = argv()
-  assert.deepStrictEqual(opts.reporter, ['spec'])
-  assert.deepStrictEqual(opts.destination, ['stdout'])
-  assert.deepStrictEqual(opts.switches, [])
+  assert.deepEqual(opts.reporter, ['spec'])
+  assert.deepEqual(opts.destination, ['stdout'])
+  assert.deepEqual(opts.switches, [])
   assert.equal(opts.isolation, undefined)
   assert.equal(opts.main, undefined)
 })
 
 test('positionals set main globs', () => {
   let opts = argv('test/main/**', 'test/other/**')
-  assert.deepStrictEqual(opts.main, ['test/main/**', 'test/other/**'])
+  assert.deepEqual(opts.main, ['test/main/**', 'test/other/**'])
 })
 
 test('--isolation', () => {
@@ -26,22 +26,22 @@ test('--isolation', () => {
 })
 
 test('--concurrency is numeric', () => {
-  assert.strictEqual(argv('-c', '4').concurrency, 4)
+  assert.equal(argv('-c', '4').concurrency, 4)
 })
 
 test('--timeout is numeric', () => {
-  assert.strictEqual(argv('-t', '5000').timeout, 5000)
+  assert.equal(argv('-t', '5000').timeout, 5000)
 })
 
 test('--name-pattern becomes testNamePatterns', () => {
   let opts = argv('-g', 'foo', '-g', 'bar')
-  assert.deepStrictEqual(opts.testNamePatterns, ['foo', 'bar'])
+  assert.deepEqual(opts.testNamePatterns, ['foo', 'bar'])
   assert.equal(opts['name-pattern'], undefined)
 })
 
 test('--skip-pattern becomes testSkipPatterns', () => {
   let opts = argv('-x', 'slow')
-  assert.deepStrictEqual(opts.testSkipPatterns, ['slow'])
+  assert.deepEqual(opts.testSkipPatterns, ['slow'])
   assert.equal(opts['skip-pattern'], undefined)
 })
 
@@ -57,7 +57,7 @@ test('--only', () => {
 
 test('--renderer', () => {
   let opts = argv('-r', 'test/renderer/**')
-  assert.deepStrictEqual(opts.renderer, ['test/renderer/**'])
+  assert.deepEqual(opts.renderer, ['test/renderer/**'])
 })
 
 test('reporter/destination mismatch throws', () => {
@@ -94,6 +94,6 @@ test('--global-setup becomes globalSetupPath', () => {
 
 test('unknown flags collected in switches', () => {
   let opts = argv('--no-sandbox', '--unknown-flag')
-  assert.deepStrictEqual(opts.switches, ['--no-sandbox', '--unknown-flag'])
+  assert.deepEqual(opts.switches, ['--no-sandbox', '--unknown-flag'])
   assert.equal(opts.main, undefined)
 })
