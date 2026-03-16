@@ -12,130 +12,109 @@ let { version } = JSON.parse(
 
 let sandbox = process.platform === 'linux' ? ['--no-sandbox'] : []
 
-function spark (args, opts) {
+function spark (args, ...files) {
+  if (typeof args === 'string') args = args.split(/\s+/)
   return new Promise((resolve, reject) => {
-    execFile(process.execPath, [bin, ...sandbox, ...args], opts, (err, stdout, stderr) => {
-      if (err && !err.code) return reject(err)
-      resolve({ code: err?.code ?? 0, stdout, stderr })
+    execFile(process.execPath, [
+      bin,
+      ...sandbox,
+      ...args,
+      ...files
+    ], (err, stdout, stderr) => {
+      if (err && !err.code)
+        return reject(err)
+      else
+        resolve({ code: err?.code ?? 0, stdout, stderr })
     })
   })
 }
 
-test('--version', async () => {
-  let { code, stdout } = await spark(['--version'])
-  assert.equal(code, 0)
-  assert.match(stdout.trim(), new RegExp(`^${version} \\(.+\\)$`))
-})
+test('--version', () =>
+  spark('--version').then(({ code, stdout }) => {
+    assert.equal(code, 0)
+    assert.match(stdout.trim(), new RegExp(`^${version} \\(.+\\)$`))
+  }))
 
-test('--help', async () => {
-  let { code, stdout } = await spark(['--help'])
-  assert.equal(code, 0)
-  assert.match(stdout, /Usage: spark/)
-})
+test('--help', () =>
+  spark('--help').then(({ code, stdout }) => {
+    assert.equal(code, 0)
+    assert.match(stdout, /Usage: spark/)
+  }))
 
-test('--verbose', async () => {
-  let { code, stderr } = await spark(['--verbose', F.test('cli')])
-  assert.equal(code, 0)
-  assert.match(stderr, /spark-/)
-})
+test('--verbose', () =>
+  spark('--verbose', F.test('cli'))
+    .then(({ code, stderr }) => {
+      assert.equal(code, 0)
+      assert.match(stderr, /spark-/)
+    }))
 
-test('--name-pattern', async () => {
-  let { code, stdout } = await spark([
-    '-i', 'process',
-    '-R', 'tap',
-    '-O', 'stdout',
-    '-g', 'ionize',
-    F.test('cli')
-  ])
-  assert.equal(code, 0)
-  assert.match(stdout, /ok 1 - ionize/)
-  assert.doesNotMatch(stdout, /detect/)
-  assert.doesNotMatch(stdout, /discharge/)
-})
+test('--name-pattern', () =>
+  spark('-i process -R tap -g ionize', F.test('cli'))
+    .then(({ code, stdout }) => {
+      assert.equal(code, 0)
+      assert.match(stdout, /ok 1 - ionize/)
+      assert.doesNotMatch(stdout, /detect/)
+      assert.doesNotMatch(stdout, /discharge/)
+    }))
 
-test('--skip-pattern', async () => {
-  let { code, stdout } = await spark([
-    '-i', 'process',
-    '-R', 'tap',
-    '-O', 'stdout',
-    '-x', 'discharge',
-    F.test('cli')
-  ])
-  assert.equal(code, 0)
-  assert.match(stdout, /ok 1 - ionize/)
-  assert.match(stdout, /ok 2 - detect/)
-  assert.doesNotMatch(stdout, /ok.*discharge/)
-})
+test('--skip-pattern', () =>
+  spark('-i process -R tap -x discharge', F.test('cli'))
+    .then(({ code, stdout }) => {
+      assert.equal(code, 0)
+      assert.match(stdout, /ok 1 - ionize/)
+      assert.match(stdout, /ok 2 - detect/)
+      assert.doesNotMatch(stdout, /ok.*discharge/)
+    }))
 
-test('--only', async () => {
-  let { code, stdout } = await spark([
-    '-i', 'process',
-    '-R', 'tap',
-    '-O', 'stdout',
-    '--only',
-    F.test('only')
-  ])
-  assert.equal(code, 0)
-  assert.match(stdout, /ok 1 - executed/)
-  assert.doesNotMatch(stdout, /ok.*skipped/)
-})
+test('--only', () =>
+  spark('-i process -R tap --only', F.test('only'))
+    .then(({ code, stdout }) => {
+      assert.equal(code, 0)
+      assert.match(stdout, /ok 1 - executed/)
+      assert.doesNotMatch(stdout, /ok.*skipped/)
+    }))
 
 test('--ui', async (t) => {
-  await t.test('bdd', async () => {
-    let { code, stdout } = await spark([
-      '--ui', 'bdd', '-R', 'tap', '-O', 'stdout', F.test('bdd')
-    ])
-    assert.equal(code, 0)
-    assert.match(stdout, /ok 1 - works/)
-    assert.match(stdout, /ok 2 - alias/)
-    assert.match(stdout, /ok 1 - also works/)
-  })
+  await t.test('bdd', () =>
+    spark('--ui bdd -R tap', F.test('bdd'))
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /ok 1 - works/)
+        assert.match(stdout, /ok 2 - alias/)
+        assert.match(stdout, /ok 1 - also works/)
+      }))
 
-  await t.test('tdd', async () => {
-    let { code, stdout } = await spark([
-      '--ui', 'tdd', '-R', 'tap', '-O', 'stdout', F.test('tdd')
-    ])
-    assert.equal(code, 0)
-    assert.match(stdout, /ok 1 - works/)
-  })
+  await t.test('tdd', () =>
+    spark('--ui tdd -R tap', F.test('tdd'))
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /ok 1 - works/)
+      }))
 })
 
 test('--global-setup', async (t) => {
-  await t.test('runs setup and teardown', async () => {
-    let { code, stdout } = await spark([
-      '-S', F.js('setup'),
-      '-R', 'tap',
-      '-O', 'stdout',
-      F.test('setup')
-    ])
+  await t.test('runs setup and teardown', () =>
+    spark(['-S', F.js('setup'), '-R', 'tap'], F.test('setup'))
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /ok 1 - global setup ran before tests/)
+        assert.match(stdout, /ok 2 - module imported before app ready/)
+        assert.match(stdout, /SPARK_TEARDOWN/)
+      }))
 
-    assert.equal(code, 0)
-    assert.match(stdout, /ok 1 - global setup ran before tests/)
-    assert.match(stdout, /ok 2 - module imported before app ready/)
-    assert.match(stdout, /SPARK_TEARDOWN/)
-  })
+  await t.test('setup failure skips tests and teardown', () =>
+    spark(['-S', F.js('setup-fail'), '-R', 'tap'], F.test('cli'))
+      .then(({ code, stdout, stderr }) => {
+        assert.equal(code, 1)
+        assert.match(stderr, /setup failed/)
+        assert.doesNotMatch(stdout, /ok/)
+        assert.doesNotMatch(stdout, /SPARK_TEARDOWN/)
+      }))
 
-  await t.test('setup failure skips tests and teardown', async () => {
-    let { code, stdout, stderr } = await spark([
-      '-S', F.js('setup-fail'),
-      '-R', 'tap',
-      '-O', 'stdout',
-      F.test('cli')
-    ])
-
-    assert.equal(code, 1)
-    assert.match(stderr, /setup failed/)
-    assert.doesNotMatch(stdout, /ok/)
-    assert.doesNotMatch(stdout, /SPARK_TEARDOWN/)
-  })
-
-  await t.test('bad module path', async () => {
-    let { code, stderr } = await spark([
-      '-S', 'nonexistent.js',
-      F.test('cli')
-    ])
-
-    assert.equal(code, 1)
-    assert.match(stderr, /ERROR/)
-  })
+  await t.test('bad module path', () =>
+    spark(['-S', 'nonexistent.js'], F.test('cli'))
+      .then(({ code, stderr }) => {
+        assert.equal(code, 1)
+        assert.match(stderr, /ERROR/)
+      }))
 })
