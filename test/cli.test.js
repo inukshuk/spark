@@ -13,7 +13,9 @@ let { version } = JSON.parse(
 let sandbox = process.platform === 'linux' ? ['--no-sandbox'] : []
 
 function spark (args, ...files) {
-  if (typeof args === 'string') args = args.split(/\s+/)
+  if (typeof args === 'string')
+    args = args.split(/\s+/)
+
   return new Promise((resolve, reject) => {
     execFile(process.execPath, [
       bin,
@@ -75,8 +77,8 @@ test('--only', () =>
     }))
 
 test('--ui', async (t) => {
-  await t.test('bdd', () =>
-    spark('--ui bdd -R tap', F.test('bdd'))
+  await t.test('bdd with process isolation', () =>
+    spark('-i process --ui bdd -R tap', F.test('bdd'))
       .then(({ code, stdout }) => {
         assert.equal(code, 0)
         assert.match(stdout, /ok 1 - works/)
@@ -84,17 +86,31 @@ test('--ui', async (t) => {
         assert.match(stdout, /ok 1 - also works/)
       }))
 
-  await t.test('tdd', () =>
-    spark('--ui tdd -R tap', F.test('tdd'))
+  await t.test('tdd with process isolation', () =>
+    spark('-i process --ui tdd -R tap', F.test('tdd'))
       .then(({ code, stdout }) => {
         assert.equal(code, 0)
         assert.match(stdout, /ok 1 - works/)
+      }))
+
+  await t.test('bdd in main and renderer', () =>
+    spark(`-r ${F.test('bdd')} --ui bdd -R tap ${F.test('bdd')}`)
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /# tests 6/)
+      }))
+
+  await t.test('tdd in main and renderer', () =>
+    spark(`-r ${F.test('tdd')} --ui tdd -R tap ${F.test('tdd')}`)
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /# tests 2/)
       }))
 })
 
 test('--global-setup', async (t) => {
   await t.test('runs setup and teardown', () =>
-    spark(['-S', F.js('setup'), '-R', 'tap'], F.test('setup'))
+    spark(`-S ${F.js('setup')} -R tap ${F.test('setup')}`)
       .then(({ code, stdout }) => {
         assert.equal(code, 0)
         assert.match(stdout, /ok 1 - global setup ran before tests/)
@@ -103,7 +119,7 @@ test('--global-setup', async (t) => {
       }))
 
   await t.test('setup failure skips tests and teardown', () =>
-    spark(['-S', F.js('setup-fail'), '-R', 'tap'], F.test('cli'))
+    spark(`-S ${F.js('setup-fail')} -R tap ${F.test('cli')}`)
       .then(({ code, stdout, stderr }) => {
         assert.equal(code, 1)
         assert.match(stderr, /setup failed/)
