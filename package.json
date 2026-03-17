@@ -1,6 +1,7 @@
 {
-  "name": "spark",
-  "version": "1.0.0",
+  "name": "spark-chamber",
+  "productName": "spark",
+  "version": "0.1.0",
   "description": "The Electron test runner",
   "main": "lib/main.js",
   "exports": {
@@ -8,12 +9,14 @@
     "./config": "./lib/config.js",
     "./init": "./lib/init.js"
   },
+  "files": ["bin", "lib"],
   "type": "module",
   "bin": {
     "spark": "./bin/spark.cjs"
   },
   "scripts": {
     "lint": "eslint eslint.config.js bin lib test",
+    "prepublishOnly": "npm run lint && npm test",
     "test": "npm run test:spark && npm run test:node",
     "test:spark": "electron --no-sandbox . test/main/**/*.test.js -r test/renderer/**/*.test.js",
     "test:node": "node --test test/cli.test.js"
