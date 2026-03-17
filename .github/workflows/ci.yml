@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Install Electron 
+      - name: Install Electron
         run: npm install --save-dev electron@${{ matrix.electron }}
 
       - name: Run test:spark
