@@ -1,7 +1,7 @@
 {
   "name": "spark-chamber",
   "productName": "spark",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "The Electron test runner",
   "main": "lib/main.js",
   "exports": {
@@ -9,7 +9,10 @@
     "./config": "./lib/config.js",
     "./init": "./lib/init.js"
   },
-  "files": ["bin", "lib"],
+  "files": [
+    "bin",
+    "lib"
+  ],
   "type": "module",
   "bin": {
     "spark": "./bin/spark.cjs"
@@ -44,7 +47,9 @@
     "electron": ">=40"
   },
   "peerDependenciesMeta": {
-    "electron": { "optional": true }
+    "electron": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "electron": "^41.0.2",
