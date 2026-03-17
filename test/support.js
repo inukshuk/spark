@@ -19,14 +19,14 @@ export async function collect (stream, type) {
     return events
 }
 
-export function collectTests (stream) {
+export function collectTests (stream, status = 'pass') {
   return collect(stream, e => (
-    e.type === 'test:pass' && e.data.details?.type === 'test'
+    e.type === `test:${status}` && e.data.details?.type === 'test'
   ))
 }
 
-export async function assertTestNames (stream, expected) {
-  let events = await collectTests(stream)
+export async function assertTestNames (stream, expected, status = 'pass') {
+  let events = await collectTests(stream, status)
   let names = events.map(e => e.data.name)
   assert.deepEqual(names, expected)
 }
