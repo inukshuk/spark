@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "The Electron test runner",
   "main": "lib/main.js",
+  "exports": {
+    ".": "./lib/spark.js",
+    "./config": "./lib/config.js",
+    "./init": "./lib/init.js"
+  },
   "type": "module",
   "bin": {
     "spark": "./bin/spark.cjs"
