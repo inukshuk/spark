@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import { F } from './support.js'
 
-let bin = join(import.meta.dirname, '../bin/spark.cjs')
+let root = join(import.meta.dirname, '..')
 let { version } = JSON.parse(
   readFileSync(join(import.meta.dirname, '../package.json'), 'utf-8')
 )
@@ -18,7 +18,7 @@ function spark (args, ...files) {
 
   return new Promise((resolve, reject) => {
     execFile(process.execPath, [
-      bin,
+      root,
       ...sandbox,
       ...args,
       ...files
