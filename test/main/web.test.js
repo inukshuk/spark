@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import { runRenderer } from '../../lib/spark.js'
-import { assertTestNames, F } from '../support.js'
+import { F } from '../support/fixtures.js'
+import { assertTestNames } from '../support/stream.js'
 
 let files = [F.test('web')]
 

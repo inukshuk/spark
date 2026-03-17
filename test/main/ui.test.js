@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import { runMain, runRenderer } from '../../lib/spark.js'
-import { assertTestNames, F } from '../support.js'
+import { F } from '../support/fixtures.js'
+import { assertTestNames } from '../support/stream.js'
 
 test('bdd with process isolation', () =>
   assertTestNames(runMain({

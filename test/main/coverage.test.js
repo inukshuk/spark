@@ -1,41 +1,51 @@
 import assert from 'node:assert/strict'
-import { test } from 'node:test'
+import { describe, it } from 'node:test'
 import { runMain, runRenderer } from '../../lib/spark.js'
-import { F } from '../support.js'
+import { F } from '../support/fixtures.js'
+import { collectCoverage, coveredFunctions } from '../support/stream.js'
 
-test('coverage from main and renderer combined', {
-  skip: process.platform === 'win32'
-}, async () => {
-  let coverages = []
+describe('coverage', () => {
+  describe('main', () => {
+    it('collects coverage with isolation="process"', async () => {
+      let coverages = await collectCoverage(runMain({
+        files: [F.test('chamber')],
+        coverage: true,
+        isolation: 'process',
+      }))
 
-  let opts = {
-    globPatterns: [F.test('chamber')],
-    coverage: true,
-  }
+      assert.equal(coverages.length, 1)
 
-  async function collect (stream) {
-    for await (let event of stream) {
-      if (event.type === 'test:coverage')
-        coverages.push(event.data)
-    }
-  }
+      let covered = coveredFunctions(coverages, F.js('chamber'))
+      assert.ok(covered.has('ionize'), 'ionize should be covered')
+    })
 
-  await Promise.all([
-    collect(runMain(opts)),
-    collect(runRenderer(opts))
-  ])
+    it('collects coverage with isolation="node"')
+  })
 
-  assert.equal(coverages.length, 2)
+  describe('renderer', () => {
+    it('collects coverage')
+  })
 
-  let covered = new Set()
+  describe('combined', () => {
+    it('collects coverage both combined', {
+      skip: process.platform === 'win32'
+    }, async () => {
+      let opts = {
+        globPatterns: [F.test('chamber')],
+        coverage: true,
+      }
 
-  for (let cov of coverages) {
-    let file = cov.summary.files.find((f) => f.path === F.js('chamber'))
-    assert.ok(file, 'chamber.js should appear in coverage')
-    for (let fn of file.functions)
-      if (fn.count > 0) covered.add(fn.name)
-  }
+      let [mainCov, rendererCov] = await Promise.all([
+        collectCoverage(runMain(opts)),
+        collectCoverage(runRenderer(opts))
+      ])
 
-  assert.ok(covered.has('ionize'), 'ionize should be covered')
-  assert.ok(covered.has('detect'), 'detect should be covered')
+      let coverages = [...mainCov, ...rendererCov]
+      assert.equal(coverages.length, 2)
+
+      let covered = coveredFunctions(coverages, F.js('chamber'))
+      assert.ok(covered.has('ionize'), 'ionize should be covered')
+      assert.ok(covered.has('detect'), 'detect should be covered')
+    })
+  })
 })

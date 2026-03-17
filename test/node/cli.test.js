@@ -1,35 +1,7 @@
 import assert from 'node:assert/strict'
-import { execFile } from 'node:child_process'
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { test } from 'node:test'
-import { F } from './support.js'
-
-let root = join(import.meta.dirname, '..')
-let { version } = JSON.parse(
-  readFileSync(join(import.meta.dirname, '../package.json'), 'utf-8')
-)
-
-let sandbox = process.platform === 'linux' ? ['--no-sandbox'] : []
-
-function spark (args, ...files) {
-  if (typeof args === 'string')
-    args = args.split(/\s+/)
-
-  return new Promise((resolve, reject) => {
-    execFile(process.execPath, [
-      root,
-      ...sandbox,
-      ...args,
-      ...files
-    ], (err, stdout, stderr) => {
-      if (err && !err.code)
-        return reject(err)
-      else
-        resolve({ code: err?.code ?? 0, stdout, stderr })
-    })
-  })
-}
+import { F } from '../support/fixtures.js'
+import { spark, version } from '../support/process.js'
 
 test('--version', () =>
   spark('--version').then(({ code, stdout }) => {
