@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { tmpdir } from 'node:os'
 import { test } from 'node:test'
-import { app } from 'electron'
+import { app, protocol } from 'electron'
 
 test('app name', () => {
   assert.equal(app.getName(), 'spark')
@@ -23,4 +23,8 @@ test('app paths are in tmp dir', () => {
       `${name} should be in tmp`
     )
   }
+})
+
+test('spark protocol is registered', () => {
+  assert(protocol.isProtocolHandled('spark'))
 })
