@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { runMain, runRenderer } from '../../lib/spark.js'
+import { run, runMain, runRenderer } from '../../lib/spark.js'
 import { F } from '../support/fixtures.js'
 import { collectCoverage, coveredFunctions } from '../support/stream.js'
 
@@ -74,25 +74,21 @@ describe('coverage', () => {
   })
 
   describe('combined', () => {
-    it('collects coverage both combined', {
+    it('merges main and renderer coverage', {
       skip: process.platform === 'win32'
     }, async () => {
-      let shared = {
-        files: [F.test('chamber')],
+      let coverages = await collectCoverage(run({
+        main: [F.test('chamber')],
+        renderer: [F.test('chamber')],
         coverage: true,
-      }
+        isolation: 'process'
+      }))
 
-      let [mainCov, rendererCov] = await Promise.all([
-        collectCoverage(runMain({ ...shared, isolation: 'process' })),
-        collectCoverage(runRenderer(shared))
-      ])
-
-      let coverages = [...mainCov, ...rendererCov]
-      assert.equal(coverages.length, 2)
+      assert.equal(coverages.length, 1, 'should emit one merged coverage event')
 
       let covered = coveredFunctions(coverages, F.js('chamber'))
-      assert.ok(covered.has('ionize'), 'ionize should be covered')
-      assert.ok(covered.has('detect'), 'detect should be covered')
+      assert.ok(covered.has('ionize'), 'ionize should be covered (main)')
+      assert.ok(covered.has('detect'), 'detect should be covered (renderer)')
     })
   })
 })
