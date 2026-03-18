@@ -59,6 +59,18 @@ describe('coverage', () => {
       let covered = coveredFunctions(coverages, F.js('chamber'))
       assert.ok(covered.has('detect'), 'detect should be covered')
     })
+
+    it('respects coverageExcludeGlobs', async () => {
+      let coverages = await collectCoverage(runRenderer({
+        files: [F.test('chamber')],
+        coverage: true,
+        coverageExcludeGlobs: ['**/chamber.js']
+      }))
+
+      assert.equal(coverages.length, 1)
+      let file = coverages[0].summary.files.find(f => f.path === F.js('chamber'))
+      assert.equal(file, undefined, 'chamber.js should be excluded')
+    })
   })
 
   describe('combined', () => {
