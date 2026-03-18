@@ -28,6 +28,14 @@ function run (electron) {
       ...process.argv.slice(2)
     ]
 
+    if (process.argv.includes('--coverage') && !process.env.NODE_V8_COVERAGE) {
+      let { mkdtempSync } = require('node:fs')
+      let { tmpdir } = require('node:os')
+
+      process.env.NODE_V8_COVERAGE =
+        mkdtempSync(join(tmpdir(), 'spark-coverage-'))
+    }
+
     let child = spawn(electron, args)
 
     child.stdout.pipe(process.stdout)
