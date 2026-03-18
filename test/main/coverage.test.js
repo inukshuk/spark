@@ -74,9 +74,7 @@ describe('coverage', () => {
   })
 
   describe('combined', () => {
-    it('merges main and renderer coverage', {
-      skip: process.platform === 'win32'
-    }, async () => {
+    it('merges main and renderer coverage', async () => {
       let coverages = await collectCoverage(run({
         mainGlobPatterns: [F.test('chamber')],
         rendererGlobPatterns: [F.test('chamber')],
