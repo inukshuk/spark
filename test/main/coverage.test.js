@@ -19,7 +19,20 @@ describe('coverage', () => {
       assert.ok(covered.has('ionize'), 'ionize should be covered')
     })
 
-    it('collects coverage with isolation="node"')
+    it('collects coverage with isolation="none"', {
+      skip: !process.env.NODE_V8_COVERAGE && 'requires NODE_V8_COVERAGE at startup'
+    }, async () => {
+      let coverages = await collectCoverage(runMain({
+        files: [F.test('chamber')],
+        coverage: true,
+        isolation: 'none',
+      }))
+
+      assert.equal(coverages.length, 1)
+
+      let covered = coveredFunctions(coverages, F.js('chamber'))
+      assert.ok(covered.has('ionize'), 'ionize should be covered')
+    })
   })
 
   describe('renderer', () => {
@@ -30,14 +43,14 @@ describe('coverage', () => {
     it('collects coverage both combined', {
       skip: process.platform === 'win32'
     }, async () => {
-      let opts = {
+      let shared = {
         globPatterns: [F.test('chamber')],
         coverage: true,
       }
 
       let [mainCov, rendererCov] = await Promise.all([
-        collectCoverage(runMain(opts)),
-        collectCoverage(runRenderer(opts))
+        collectCoverage(runMain({ ...shared, isolation: 'process' })),
+        collectCoverage(runRenderer(shared))
       ])
 
       let coverages = [...mainCov, ...rendererCov]
