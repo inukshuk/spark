@@ -21,7 +21,8 @@
     "lint": "eslint eslint.config.js bin lib test",
     "test": "npm run test:spark && npm run test:node",
     "test:spark": "electron --no-sandbox . test/main/**/*.test.js -r test/renderer/**/*.test.js",
-    "test:node": "node --test test/node/**/*.test.js"
+    "test:node": "node --test test/node/**/*.test.js",
+    "coverage": "c8 -o coverage --reporter=text --reporter=lcov --include='lib/**' --include='bin/**' npm test"
   },
   "repository": {
     "type": "git",
@@ -51,6 +52,7 @@
     }
   },
   "devDependencies": {
+    "c8": "^11.0.0",
     "electron": "^41.0.2",
     "eslint": "^9.5.0",
     "neostandard": "^0.13.0"
