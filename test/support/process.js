@@ -30,7 +30,7 @@ export function spark (args, ...files) {
   })
 }
 
-export function sparkBin (args) {
+export function sparkBin (args, { env } = {}) {
   if (typeof args === 'string')
     args = args.split(/\s+/)
 
@@ -39,7 +39,7 @@ export function sparkBin (args) {
       bin,
       ...sandbox,
       ...args
-    ], (err, stdout, stderr) => {
+    ], { ...(env && { env }) }, (err, stdout, stderr) => {
       if (err && !err.code)
         return reject(err)
       else

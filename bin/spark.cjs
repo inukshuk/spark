@@ -7,11 +7,21 @@ const process = require('node:process')
 const { join } = require('node:path')
 const { spawn } = require('node:child_process')
 
+if (process.versions.electron) {
+  throw new Error(`
+    bin/spark.cjs is a Node.js CLI trampoline.
+    To launch spark in Electron run 'electron spark' instead.`)
+}
+
 function resolve (module, resolver = require) {
   try {
     return resolver(module)
-  } catch {
-    return null
+  } catch (e) {
+    if (e.code === 'MODULE_NOT_FOUND')
+      return null
+
+    console.error(e.message)
+    process.exit(1)
   }
 }
 
@@ -41,6 +51,11 @@ function run (electron) {
     child.stdout.pipe(process.stdout)
     child.stderr.pipe(process.stderr)
 
+    child.on('error', (e) => {
+      console.error(e.message)
+      process.exit(1)
+    })
+
     child.on('exit', (code, signal) => {
       if (signal)
         process.kill(process.pid, signal)
@@ -48,10 +63,8 @@ function run (electron) {
         process.exit(code)
     })
 
-    process.on('SIGINT', () => {
-      child.kill('SIGINT')
-      child.kill('SIGTERM')
-    })
+    process.on('SIGINT', () => child.kill('SIGINT'))
+    process.on('SIGTERM', () => child.kill('SIGTERM'))
   }
 }
 
