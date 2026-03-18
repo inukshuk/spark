@@ -46,10 +46,7 @@ function run (electron) {
         mkdtempSync(join(tmpdir(), 'spark-coverage-'))
     }
 
-    let child = spawn(electron, args)
-
-    child.stdout.pipe(process.stdout)
-    child.stderr.pipe(process.stderr)
+    let child = spawn(electron, args, { stdio: 'inherit' })
 
     child.on('error', (e) => {
       console.error(e.message)
