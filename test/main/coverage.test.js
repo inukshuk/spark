@@ -36,7 +36,29 @@ describe('coverage', () => {
   })
 
   describe('renderer', () => {
-    it('collects coverage')
+    it('collects coverage', async () => {
+      let coverages = await collectCoverage(runRenderer({
+        files: [F.test('chamber')],
+        coverage: true,
+      }))
+
+      assert.equal(coverages.length, 1)
+
+      let { summary } = coverages[0]
+      assert.ok(summary.workingDirectory)
+      assert.ok(summary.totals)
+      assert.ok(summary.thresholds)
+
+      let file = summary.files.find(f => f.path === F.js('chamber'))
+      assert.ok(file, 'chamber.js should be in coverage')
+      assert.ok(file.totalLineCount > 0)
+      assert.ok(Array.isArray(file.lines))
+      assert.ok(Array.isArray(file.branches))
+      assert.ok(Array.isArray(file.functions))
+
+      let covered = coveredFunctions(coverages, F.js('chamber'))
+      assert.ok(covered.has('detect'), 'detect should be covered')
+    })
   })
 
   describe('combined', () => {
@@ -44,7 +66,7 @@ describe('coverage', () => {
       skip: process.platform === 'win32'
     }, async () => {
       let shared = {
-        globPatterns: [F.test('chamber')],
+        files: [F.test('chamber')],
         coverage: true,
       }
 
