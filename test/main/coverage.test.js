@@ -78,8 +78,8 @@ describe('coverage', () => {
       skip: process.platform === 'win32'
     }, async () => {
       let coverages = await collectCoverage(run({
-        main: [F.test('chamber')],
-        renderer: [F.test('chamber')],
+        mainGlobPatterns: [F.test('chamber')],
+        rendererGlobPatterns: [F.test('chamber')],
         coverage: true,
         isolation: 'process'
       }))

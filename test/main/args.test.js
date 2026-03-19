@@ -8,16 +8,15 @@ function argv (...args) {
 
 test('defaults', () => {
   let opts = argv()
-  assert.deepEqual(opts.reporter, ['spec'])
-  assert.deepEqual(opts.destination, ['stdout'])
+  assert.deepEqual(opts.reporters, [{ reporter: 'spec', destination: 'stdout' }])
   assert.deepEqual(opts.switches, [])
   assert.equal(opts.isolation, undefined)
-  assert.equal(opts.main, undefined)
+  assert.equal(opts.globPatterns, undefined)
 })
 
-test('positionals set main globs', () => {
+test('positionals set globPatterns', () => {
   let opts = argv('test/main/**', 'test/other/**')
-  assert.deepEqual(opts.main, ['test/main/**', 'test/other/**'])
+  assert.deepEqual(opts.globPatterns, ['test/main/**', 'test/other/**'])
 })
 
 test('--isolation', () => {
@@ -57,19 +56,17 @@ test('--only', () => {
 
 test('--renderer', () => {
   let opts = argv('-r', 'test/renderer/**')
-  assert.deepEqual(opts.renderer, ['test/renderer/**'])
+  assert.deepEqual(opts.rendererGlobPatterns, ['test/renderer/**'])
 })
 
-test('reporter/destination mismatch throws', () => {
-  assert.throws(
-    () => argv('-R', 'spec', '-R', 'tap', '-O', 'stdout'),
-    /must have a matching --destination/
-  )
+test('--main', () => {
+  let opts = argv('-m', 'test/main/**')
+  assert.deepEqual(opts.mainGlobPatterns, ['test/main/**'])
 })
 
 test('unknown reporter throws', () => {
   assert.throws(
-    () => argv('-R', 'nonexistent', '-O', 'stdout'),
+    () => argv('-R', 'nonexistent'),
     /Unknown reporter/
   )
 })
@@ -95,5 +92,5 @@ test('--global-setup becomes globalSetupPath', () => {
 test('unknown flags collected in switches', () => {
   let opts = argv('--no-sandbox', '--unknown-flag')
   assert.deepEqual(opts.switches, ['--no-sandbox', '--unknown-flag'])
-  assert.equal(opts.main, undefined)
+  assert.equal(opts.globPatterns, undefined)
 })
