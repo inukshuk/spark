@@ -80,6 +80,36 @@ test('--ui', async (t) => {
       }))
 })
 
+test('--preload', async (t) => {
+  await t.test('with process isolation', () =>
+    spark(`-i process --preload ${F.js('preload')} -R tap`, F.test('preload'))
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /ok 1 - module imported before tests/)
+      }))
+
+  await t.test('in renderer', () =>
+    spark(`-r ${F.test('preload')} --preload ${F.js('preload')} -R tap`)
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /ok 1 - module imported before tests/)
+      }))
+
+  await t.test('without isolation', () =>
+    spark(`--preload ${F.js('preload')} -R tap`, F.test('preload'))
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /ok 1 - module imported before tests/)
+      }))
+
+  await t.test('bad module path', () =>
+    spark(['--preload', 'nonexistent.js'], F.test('cli'))
+      .then(({ code, stderr }) => {
+        assert.equal(code, 1)
+        assert.match(stderr, /ERR_MODULE_NOT_FOUND/)
+      }))
+})
+
 test('--global-setup', async (t) => {
   await t.test('runs setup and teardown', () =>
     spark(`-S ${F.js('setup')} -R tap ${F.test('setup')}`)

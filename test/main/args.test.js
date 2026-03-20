@@ -86,6 +86,13 @@ test('--global-setup becomes globalSetupPath', () => {
   assert.equal(opts['global-setup'], undefined)
 })
 
+test('--preload resolves paths', () => {
+  let opts = argv('--preload', 'setup.js', '--preload', 'other.js')
+  assert.equal(opts.preload.length, 2)
+  assert.match(opts.preload[0], /setup\.js$/)
+  assert.match(opts.preload[1], /other\.js$/)
+})
+
 test('unknown flags collected in switches', () => {
   let opts = argv('--no-sandbox', '--unknown-flag')
   assert.deepEqual(opts.switches, ['--no-sandbox', '--unknown-flag'])
