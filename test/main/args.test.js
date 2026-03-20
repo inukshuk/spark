@@ -8,10 +8,7 @@ function argv (...args) {
 
 test('defaults', () => {
   let opts = argv()
-  assert.deepEqual(opts.reporters, [{ reporter: 'spec', destination: 'stdout' }])
-  assert.deepEqual(opts.switches, [])
-  assert.equal(opts.isolation, undefined)
-  assert.equal(opts.globPatterns, undefined)
+  assert.deepEqual(Object.keys(opts), [])
 })
 
 test('positionals set globPatterns', () => {
