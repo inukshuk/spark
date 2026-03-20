@@ -1,0 +1,14 @@
+{
+  "name": "test-spark-config",
+  "spark": {
+    "isolation": "process",
+    "verbose": true,
+    "reporters": ["spec"],
+    "window": {
+      "title": "Custom Title"
+    },
+    "webPreferences": {
+      "spellcheck": true
+    }
+  }
+}
