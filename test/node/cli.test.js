@@ -110,6 +110,49 @@ test('--preload', async (t) => {
       }))
 })
 
+test('console output', async (t) => {
+  function assertRawOutput ({ code, stdout, stderr }) {
+    assert.equal(code, 0)
+    assert.match(stdout, /in-test log/)
+    assert.match(stdout, /in-test stdout/)
+    assert.match(stderr, /in-test error/)
+    assert.match(stderr, /in-test stderr/)
+  }
+
+  function assertFwdOutput ({ code, stdout, stderr }) {
+    assert.equal(code, 0)
+    assert.match(stdout, /^# in-test log$/m)
+    assert.match(stdout, /^# in-test error$/m)
+    assert.match(stdout, /^# in-test stdout$/m)
+    assert.match(stdout, /^# in-test stderr$/m)
+    assert.doesNotMatch(stderr, /in-test/)
+  }
+
+  await t.test('main isolation none', () =>
+    spark('-R tap', F.test('console'))
+      .then(assertRawOutput))
+
+  await t.test('main isolation process', () =>
+    spark('-i process -R tap', F.test('console'))
+      .then(assertFwdOutput))
+
+  await t.test('renderer', () =>
+    spark(`-r ${F.test('console')} -R tap`)
+      .then(assertFwdOutput))
+
+  await t.test('main isolation none --verbose', () =>
+    spark('--verbose -R tap', F.test('console'))
+      .then(assertRawOutput))
+
+  await t.test('main isolation process --verbose', () =>
+    spark('-i process --verbose -R tap', F.test('console'))
+      .then(assertFwdOutput))
+
+  await t.test('renderer --verbose', () =>
+    spark(`-r ${F.test('console')} --verbose -R tap`)
+      .then(assertFwdOutput))
+})
+
 test('--global-setup', async (t) => {
   await t.test('runs setup and teardown', () =>
     spark(`-S ${F.js('setup')} -R tap ${F.test('setup')}`)
