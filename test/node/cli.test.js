@@ -81,32 +81,34 @@ test('--ui', async (t) => {
 })
 
 test('--preload', async (t) => {
-  await t.test('with process isolation', () =>
-    spark(`-i process --preload ${F.js('preload')} -R tap`, F.test('preload'))
-      .then(({ code, stdout }) => {
-        assert.equal(code, 0)
-        assert.match(stdout, /ok 1 - module imported before tests/)
-      }))
+  let preloads = [
+    F.join('preload.cjs'),
+    F.js('preload')
+  ].map(mod => `--preload ${mod}`).join(' ')
 
-  await t.test('in renderer', () =>
-    spark(`-r ${F.test('preload')} --preload ${F.js('preload')} -R tap`)
-      .then(({ code, stdout }) => {
-        assert.equal(code, 0)
-        assert.match(stdout, /ok 1 - module imported before tests/)
-      }))
+  function assertPreloaded ({ code, stdout }) {
+    assert.equal(code, 0)
+    assert.match(stdout, /ok 1 - esm preload ran/)
+    assert.match(stdout, /ok 2 - cjs preload ran/)
+  }
+
+  await t.test('with process isolation', () =>
+    spark(`-i process ${preloads} -R tap`, F.test('preload'))
+      .then(assertPreloaded))
 
   await t.test('without isolation', () =>
-    spark(`--preload ${F.js('preload')} -R tap`, F.test('preload'))
-      .then(({ code, stdout }) => {
-        assert.equal(code, 0)
-        assert.match(stdout, /ok 1 - module imported before tests/)
-      }))
+    spark(`${preloads} -R tap`, F.test('preload'))
+      .then(assertPreloaded))
+
+  await t.test('in renderer', () =>
+    spark(`-r ${F.test('preload')} ${preloads} -R tap`)
+      .then(assertPreloaded))
 
   await t.test('bad module path', () =>
     spark(['--preload', 'nonexistent.js'], F.test('cli'))
       .then(({ code, stderr }) => {
         assert.equal(code, 1)
-        assert.match(stderr, /ERR_MODULE_NOT_FOUND/)
+        assert.match(stderr, /Cannot find module/)
       }))
 })
 
