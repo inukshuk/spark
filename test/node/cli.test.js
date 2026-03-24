@@ -152,6 +152,10 @@ test('error handling', async (t) => {
   await t.test('unhandled rejection in renderer', () =>
     spark(`-r ${F.test('rejection')}`)
       .then(assertErrorCode))
+
+  await t.test('renderer process crash', () =>
+    spark(`-r ${F.test('crash')}`)
+      .then(assertErrorCode))
 })
 
 test('console output', async (t) => {
