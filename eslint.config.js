@@ -10,6 +10,7 @@ export default standard({
   {
     rules: {
       curly: 0,
+      'no-ex-assign': 0,
       'no-var': 0,
       'prefer-const': 0,
       '@stylistic/comma-dangle': 0,
