@@ -112,6 +112,36 @@ test('--preload', async (t) => {
       }))
 })
 
+test('error handling', async (t) => {
+  function assertErrorCode ({ code }) {
+    assert.ok(code > 0)
+  }
+
+  await t.test('bad preload with isolation none', () =>
+    spark(['--preload', 'nonexistent.js'], F.test('cli'))
+      .then(assertErrorCode))
+
+  await t.test('bad preload with process isolation', () =>
+    spark(['-i', 'process', '--preload', 'nonexistent.js'], F.test('cli'))
+      .then(assertErrorCode))
+
+  await t.test('bad preload in renderer', () =>
+    spark(['-r', F.test('cli'), '--preload', 'nonexistent.js'])
+      .then(assertErrorCode))
+
+  await t.test('throwing test with isolation none', () =>
+    spark(F.test('throws'))
+      .then(assertErrorCode))
+
+  await t.test('throwing test with process isolation', () =>
+    spark('-i process', F.test('throws'))
+      .then(assertErrorCode))
+
+  await t.test('throwing test in renderer', () =>
+    spark(`-r ${F.test('throws')}`)
+      .then(assertErrorCode))
+})
+
 test('console output', async (t) => {
   function assertRawOutput ({ code, stdout, stderr }) {
     assert.equal(code, 0)
