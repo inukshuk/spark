@@ -11,10 +11,10 @@ let WebAPIs = [
 ]
 
 test('web APIs are available by default', () =>
-  assertTestNames(runRenderer({ files }), WebAPIs))
+  assertTestNames(runRenderer({ files })[0], WebAPIs))
 
 test('web APIs are not available with about:blank', () =>
   assertTestNames(
-    runRenderer({ files, url: 'about:blank' }),
+    runRenderer({ files, url: 'about:blank' })[0],
     WebAPIs,
     'fail'))

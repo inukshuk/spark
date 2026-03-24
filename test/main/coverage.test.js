@@ -40,7 +40,7 @@ describe('coverage', () => {
       let coverages = await collectCoverage(runRenderer({
         files: [F.test('chamber')],
         coverage: true,
-      }))
+      })[0])
 
       assert.equal(coverages.length, 1)
 
@@ -65,7 +65,7 @@ describe('coverage', () => {
         files: [F.test('chamber')],
         coverage: true,
         coverageExcludeGlobs: ['**/chamber.js']
-      }))
+      })[0])
 
       assert.equal(coverages.length, 1)
       let file = coverages[0].summary.files.find(f => f.path === F.js('chamber'))

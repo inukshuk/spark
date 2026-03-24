@@ -21,4 +21,4 @@ test('bdd in renderer', () =>
   assertTestNames(runRenderer({
     files: [F.test('bdd')],
     ui: 'bdd'
-  }), ['works', 'alias', 'also works']))
+  })[0], ['works', 'alias', 'also works']))

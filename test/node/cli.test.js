@@ -231,6 +231,33 @@ test('--global-setup', async (t) => {
       }))
 })
 
+test('renderer isolation', async (t) => {
+  let r = ['-r', F.test('isolation-a'), '-r', F.test('isolation-b')]
+
+  await t.test('isolated files pass', () =>
+    spark([...r, '-i', 'process', '-c', '2', '-R', 'tap'])
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /ok.*isolation a/)
+        assert.match(stdout, /ok.*isolation b/)
+      }))
+
+  await t.test('sequential isolation reuses windows', () =>
+    spark([...r, '-i', 'process', '-c', '1', '-R', 'tap'])
+      .then(({ code, stdout }) => {
+        assert.equal(code, 0)
+        assert.match(stdout, /ok.*isolation a/)
+        assert.match(stdout, /ok.*isolation b/)
+      }))
+
+  await t.test('without isolation second file fails', () =>
+    spark([...r, '-R', 'tap'])
+      .then(({ code, stdout }) => {
+        assert.ok(code > 0)
+        assert.match(stdout, /not ok.*isolation b/)
+      }))
+})
+
 test('--reporter with multiple destinations', async () => {
   let tmp = join(tmpdir(), `spark-test-${process.pid}.txt`)
   try {

@@ -7,7 +7,7 @@ describe('run routing', () => {
 
   beforeEach(() => {
     runMain = mock.method(run, 'runMain', () => {}).mock
-    runRenderer = mock.method(run, 'runRenderer', () => {}).mock
+    runRenderer = mock.method(run, 'runRenderer', () => []).mock
   })
   afterEach(() => {
     runMain.restore()
