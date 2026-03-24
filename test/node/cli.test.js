@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict'
+import { readFileSync, unlinkSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { test } from 'node:test'
 import { F } from '../support/fixtures.js'
 import { spark, version } from '../support/process.js'
@@ -214,7 +217,7 @@ test('--global-setup', async (t) => {
   await t.test('setup failure skips tests and teardown', () =>
     spark(`-S ${F.js('setup-fail')} -R tap ${F.test('cli')}`)
       .then(({ code, stdout, stderr }) => {
-        assert.equal.ok(code !== 0)
+        assert.ok(code !== 0)
         assert.match(stderr, /setup failed/)
         assert.doesNotMatch(stdout, /ok/)
         assert.doesNotMatch(stdout, /SPARK_TEARDOWN/)
@@ -226,4 +229,23 @@ test('--global-setup', async (t) => {
         assert.ok(code !== 0)
         assert.match(stderr, /ERROR/)
       }))
+})
+
+test('--reporter with multiple destinations', async () => {
+  let tmp = join(tmpdir(), `spark-test-${process.pid}.txt`)
+  try {
+    let { code, stdout, stderr } = await spark([
+      '-R', 'tap', '-O', 'stdout',
+      '-R', 'spec', '-O', 'stderr',
+      '-R', 'junit', '-O', tmp
+    ], F.test('cli'))
+
+    assert.equal(code, 0)
+    assert.match(stdout, /ok 1/)
+    assert.match(stderr, /ionize/)
+    let file = readFileSync(tmp, 'utf8')
+    assert.match(file, /<testsuites>/)
+  } finally {
+    try { unlinkSync(tmp) } catch {}
+  }
 })
