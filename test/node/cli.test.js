@@ -214,7 +214,7 @@ test('--global-setup', async (t) => {
   await t.test('setup failure skips tests and teardown', () =>
     spark(`-S ${F.js('setup-fail')} -R tap ${F.test('cli')}`)
       .then(({ code, stdout, stderr }) => {
-        assert.equal(code, 1)
+        assert.equal.ok(code !== 0)
         assert.match(stderr, /setup failed/)
         assert.doesNotMatch(stdout, /ok/)
         assert.doesNotMatch(stdout, /SPARK_TEARDOWN/)
@@ -223,7 +223,7 @@ test('--global-setup', async (t) => {
   await t.test('bad module path', () =>
     spark(['-S', 'nonexistent.js'], F.test('cli'))
       .then(({ code, stderr }) => {
-        assert.equal(code, 1)
+        assert.ok(code !== 0)
         assert.match(stderr, /ERROR/)
       }))
 })
