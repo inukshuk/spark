@@ -140,6 +140,18 @@ test('error handling', async (t) => {
   await t.test('throwing test in renderer', () =>
     spark(`-r ${F.test('throws')}`)
       .then(assertErrorCode))
+
+  await t.test('unhandled rejection with isolation none', () =>
+    spark(F.test('rejection'))
+      .then(assertErrorCode))
+
+  await t.test('unhandled rejection with process isolation', () =>
+    spark('-i process', F.test('rejection'))
+      .then(assertErrorCode))
+
+  await t.test('unhandled rejection in renderer', () =>
+    spark(`-r ${F.test('rejection')}`)
+      .then(assertErrorCode))
 })
 
 test('console output', async (t) => {
