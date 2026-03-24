@@ -9,6 +9,7 @@ export default standard({
 }).concat([
   {
     rules: {
+      camelcase: 0,
       curly: 0,
       'no-ex-assign': 0,
       'no-var': 0,
