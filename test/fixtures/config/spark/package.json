@@ -3,7 +3,7 @@
   "spark": {
     "isolation": "process",
     "verbose": true,
-    "reporters": ["spec"],
+    "reporters": ["beam"],
     "window": {
       "title": "Custom Title"
     },

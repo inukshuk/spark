@@ -263,15 +263,15 @@ test('--reporter with multiple destinations', async () => {
   try {
     let { code, stdout, stderr } = await spark([
       '-R', 'tap', '-O', 'stdout',
-      '-R', 'spec', '-O', 'stderr',
-      '-R', 'junit', '-O', tmp
+      '-R', 'beam', '-O', 'stderr',
+      '-R', 'sparks', '-O', tmp
     ], F.test('cli'))
 
     assert.equal(code, 0)
     assert.match(stdout, /ok 1/)
     assert.match(stderr, /ionize/)
     let file = readFileSync(tmp, 'utf8')
-    assert.match(file, /<testsuites>/)
+    assert.match(file, /\u00B7/)
   } finally {
     try { unlinkSync(tmp) } catch {}
   }
