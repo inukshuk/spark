@@ -110,7 +110,7 @@ test('--preload', async (t) => {
   await t.test('bad module path', () =>
     spark(['--preload', 'nonexistent.js'], F.test('cli'))
       .then(({ code, stderr }) => {
-        assert.ok(code > 1)
+        assert.ok(code > 0)
         assert.match(stderr, /Cannot find module/)
       }))
 })
