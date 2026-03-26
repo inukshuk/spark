@@ -162,7 +162,7 @@ test('error handling', async (t) => {
 })
 
 test('console output', async (t) => {
-  function assertRawOutput ({ code, stdout, stderr }) {
+  function assertRaw ({ code, stdout, stderr }) {
     assert.equal(code, 0)
     assert.match(stdout, /in-test log/)
     assert.match(stdout, /in-test stdout/)
@@ -170,38 +170,44 @@ test('console output', async (t) => {
     assert.match(stderr, /in-test stderr/)
   }
 
-  function assertFwdOutput ({ code, stdout, stderr }) {
+  function assertCaptured ({ code, stdout, stderr }) {
     assert.equal(code, 0)
-    assert.match(stdout, /^# in-test log$/m)
-    assert.match(stdout, /^# in-test error$/m)
-    assert.match(stdout, /^# in-test stdout$/m)
-    assert.match(stdout, /^# in-test stderr$/m)
+    assert.match(stdout, /in-test log/)
+    assert.match(stdout, /in-test error/)
+    assert.match(stdout, /in-test stdout/)
+    assert.match(stdout, /in-test stderr/)
+    assert.doesNotMatch(stderr, /in-test/)
+  }
+
+  function assertHidden ({ code, stdout, stderr }) {
+    assert.equal(code, 0)
+    assert.doesNotMatch(stdout, /in-test/)
     assert.doesNotMatch(stderr, /in-test/)
   }
 
   await t.test('main isolation none', () =>
-    spark('-R tap', F.test('console'))
-      .then(assertRawOutput))
+    spark('', F.test('console'))
+      .then(assertRaw))
 
   await t.test('main isolation process', () =>
-    spark('-i process -R tap', F.test('console'))
-      .then(assertFwdOutput))
+    spark('-i process', F.test('console'))
+      .then(assertHidden))
 
   await t.test('renderer', () =>
-    spark(`-r ${F.test('console')} -R tap`)
-      .then(assertFwdOutput))
+    spark(`-r ${F.test('console')} -R sparks`)
+      .then(assertHidden))
 
   await t.test('main isolation none --verbose', () =>
-    spark('--verbose -R tap', F.test('console'))
-      .then(assertRawOutput))
+    spark('--verbose', F.test('console'))
+      .then(assertRaw))
 
   await t.test('main isolation process --verbose', () =>
-    spark('-i process --verbose -R tap', F.test('console'))
-      .then(assertFwdOutput))
+    spark('-i process --verbose', F.test('console'))
+      .then(assertCaptured))
 
   await t.test('renderer --verbose', () =>
-    spark(`-r ${F.test('console')} --verbose -R tap`)
-      .then(assertFwdOutput))
+    spark(`-r ${F.test('console')} -R sparks --verbose`)
+      .then(assertCaptured))
 })
 
 test('--global-setup', async (t) => {
