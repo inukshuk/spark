@@ -16,6 +16,21 @@ test('positionals set globPatterns', () => {
   assert.deepEqual(opts.globPatterns, ['test/main/**', 'test/other/**'])
 })
 
+test('positional directory expands to glob', () => {
+  let opts = argv('test/main')
+  assert.deepEqual(opts.globPatterns, ['test/main/**/*.{cjs,js,mjs}'])
+})
+
+test('--main directory expands to glob', () => {
+  let opts = argv('-m', 'test/main')
+  assert.deepEqual(opts.mainGlobPatterns, ['test/main/**/*.{cjs,js,mjs}'])
+})
+
+test('--renderer directory expands to glob', () => {
+  let opts = argv('-r', 'test/renderer')
+  assert.deepEqual(opts.rendererGlobPatterns, ['test/renderer/**/*.{cjs,js,mjs}'])
+})
+
 test('--isolation', () => {
   assert.equal(argv('-i', 'process').isolation, 'process')
   assert.equal(argv('--isolation', 'none').isolation, 'none')
