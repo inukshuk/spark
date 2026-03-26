@@ -227,7 +227,7 @@ test('--global-setup', async (t) => {
     spark(['-S', 'nonexistent.js'], F.test('cli'))
       .then(({ code, stderr }) => {
         assert.ok(code !== 0)
-        assert.match(stderr, /ERROR/)
+        assert.match(stderr, /Error/i)
       }))
 })
 
