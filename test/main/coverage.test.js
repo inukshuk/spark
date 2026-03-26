@@ -6,7 +6,10 @@ import { collectCoverage, coveredFunctions } from '../support/stream.js'
 
 describe('coverage', () => {
   describe('main', () => {
-    it('collects coverage with isolation="process"', async () => {
+    it('collects coverage with isolation="process"', {
+      skip: process.platform === 'darwin' &&
+        process.env.CI && 'coverage file race on macOS CI'
+    }, async () => {
       let coverages = await collectCoverage(runMain({
         files: [F.test('chamber')],
         coverage: true,
