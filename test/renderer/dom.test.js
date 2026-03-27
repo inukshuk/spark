@@ -25,3 +25,7 @@ test('classList', () => {
   assert.ok(!particle.classList.contains('charged'))
   assert.ok(particle.classList.contains('lepton'))
 })
+
+test('run after dom-ready', () => {
+  assert.equal(document.readyState, 'complete')
+})
