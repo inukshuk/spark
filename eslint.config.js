@@ -21,7 +21,10 @@ export default standard({
   {
     files: ['test/**/*.js'],
     languageOptions: {
-      globals: globals.mocha
+      globals: {
+        ...globals.mocha,
+        ...globals.browser
+      }
     }
   }
 ])
