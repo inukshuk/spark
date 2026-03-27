@@ -8,7 +8,8 @@
       "title": "Custom Title"
     },
     "webPreferences": {
-      "spellcheck": true
+      "spellcheck": true,
+      "webSecurity": false
     }
   }
 }

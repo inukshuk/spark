@@ -37,6 +37,7 @@ describe('configure', () => {
     assert.equal(into.verbose, true)
     assert.equal(into.window.title, 'Custom Title')
     assert.equal(into.webPreferences.spellcheck, true)
+    assert.equal(into.webPreferences.webSecurity, false)
     assert.deepEqual(into.reporters, [{ reporter: 'beam', destination: 'stdout' }])
   })
 })

@@ -18,3 +18,11 @@ test('web APIs are not available with about:blank', () =>
     runRenderer({ files, url: 'about:blank' })[0],
     WebAPIs,
     'fail'))
+
+test('file:// image loads with webSecurity disabled', () =>
+  assertTestNames(
+    runRenderer({
+      files: [F.test('image')],
+      webPreferences: { webSecurity: false }
+    })[0],
+    ['file:// image']))
