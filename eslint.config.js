@@ -1,30 +1,28 @@
+import { globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import standard from 'neostandard'
 
-export default standard({
-  files: [
-    'bin/spark',
-    '**/*.js'
-  ]
-}).concat([
+export default [
+  ...standard({
+    files: ['**/*.{cjs,js}'],
+    noJsx: true
+  }),
   {
+    files: ['**/*.{cjs,js}'],
     rules: {
-      camelcase: 0,
       curly: 0,
-      'no-ex-assign': 0,
       'no-var': 0,
-      'prefer-const': 0,
-      '@stylistic/comma-dangle': 0,
-      '@stylistic/padded-blocks': 0
+      'prefer-const': 0
     }
   },
   {
-    files: ['test/**/*.js'],
+    files: ['test/**/*.{cjs,js}'],
     languageOptions: {
       globals: {
         ...globals.mocha,
         ...globals.browser
       }
     }
-  }
-])
+  },
+  globalIgnores(['coverage/'])
+]
