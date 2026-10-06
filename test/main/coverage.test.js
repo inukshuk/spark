@@ -4,6 +4,9 @@ import { run, runMain, runRenderer } from '../../lib/spark.js'
 import { F } from '../support/fixtures.js'
 import { collectCoverage, coveredFunctions } from '../support/stream.js'
 
+// Fixtures live in test/ which is excluded by default.
+const coverageExcludeGlobs = ['**/*.test.js']
+
 describe('coverage', () => {
   describe('main', () => {
     it('collects coverage with isolation="process"', {
@@ -13,6 +16,7 @@ describe('coverage', () => {
       let coverages = await collectCoverage(runMain({
         files: [F.test('chamber')],
         coverage: true,
+        coverageExcludeGlobs,
         isolation: 'process',
       }))
 
@@ -28,6 +32,7 @@ describe('coverage', () => {
       let coverages = await collectCoverage(runMain({
         files: [F.test('chamber')],
         coverage: true,
+        coverageExcludeGlobs,
         isolation: 'none',
       }))
 
@@ -43,6 +48,7 @@ describe('coverage', () => {
       let coverages = await collectCoverage(runRenderer({
         files: [F.test('chamber')],
         coverage: true,
+        coverageExcludeGlobs,
       })[0])
 
       assert.equal(coverages.length, 1)
@@ -82,6 +88,7 @@ describe('coverage', () => {
         mainGlobPatterns: [F.test('chamber')],
         rendererGlobPatterns: [F.test('chamber')],
         coverage: true,
+        coverageExcludeGlobs,
         isolation: 'process'
       }))
 
@@ -90,6 +97,21 @@ describe('coverage', () => {
       let covered = coveredFunctions(coverages, F.js('chamber'))
       assert.ok(covered.has('ionize'), 'ionize should be covered (main)')
       assert.ok(covered.has('detect'), 'detect should be covered (renderer)')
+    })
+  })
+
+  describe('defaults', () => {
+    it('excludes test files and directories', async () => {
+      let coverages = await collectCoverage(run({
+        mainGlobPatterns: [F.test('chamber')],
+        rendererGlobPatterns: [F.test('chamber')],
+        coverage: true,
+        isolation: 'process'
+      }))
+
+      let paths = coverages[0].summary.files.map(f => f.path)
+      assert.ok(!paths.includes(F.js('chamber')), 'chamber.js should be excluded')
+      assert.ok(!paths.includes(F.test('chamber')), 'chamber.test.js should be excluded')
     })
   })
 })
