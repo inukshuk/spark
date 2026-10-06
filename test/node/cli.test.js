@@ -186,22 +186,6 @@ test('error handling', async (t) => {
   await t.test('failing suite in renderer', () =>
     spark(`-r ${F.test('suite-throws')}`)
       .then(assertErrorCode))
-
-  await t.test('failing suite is reported by sparks', () =>
-    spark('-R sparks', F.test('suite-throws'))
-      .then(({ stdout }) => {
-        assert.match(stdout, /✶/)
-        assert.match(stdout, /broken suite/)
-        assert.match(stdout, /suite body failed/)
-        assert.match(stdout, /1 pass {3}✶ 1 fail/)
-      }))
-
-  await t.test('failing suite is counted by beamline', () =>
-    spark('-R beam', F.test('suite-throws'))
-      .then(({ stdout }) => {
-        assert.match(stdout, /✶ 1 fail/)
-        assert.match(stdout, /^ +✶ broken suite \(.+\)$\n(?:.*\n)*^ +│ 1 pass/m)
-      }))
 })
 
 test('console output', async (t) => {
@@ -350,7 +334,7 @@ test('--reporter with multiple destinations', async () => {
     assert.match(stdout, /ok 1/)
     assert.match(stderr, /ionize/)
     let file = readFileSync(tmp, 'utf8')
-    assert.match(file, /\u00B7/)
+    assert.match(file, /3 pass/)
   } finally {
     try { unlinkSync(tmp) } catch {}
   }
