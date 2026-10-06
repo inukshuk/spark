@@ -159,6 +159,49 @@ test('error handling', async (t) => {
   await t.test('renderer process crash', () =>
     spark(`-r ${F.test('crash')}`)
       .then(assertErrorCode))
+
+  await t.test('file not found with isolation none', () =>
+    spark('nonexistent.test.js')
+      .then(assertErrorCode))
+
+  await t.test('file not found with process isolation', () =>
+    spark('-i process nonexistent.test.js')
+      .then(assertErrorCode))
+
+  await t.test('renderer file not found', () =>
+    spark('-r nonexistent.test.js -R sparks')
+      .then(({ code, stderr }) => {
+        assert.ok(code > 0)
+        assert.doesNotMatch(stderr, /TypeError/)
+      }))
+
+  await t.test('failing suite with isolation none', () =>
+    spark(F.test('suite-throws'))
+      .then(assertErrorCode))
+
+  await t.test('failing suite with process isolation', () =>
+    spark('-i process', F.test('suite-throws'))
+      .then(assertErrorCode))
+
+  await t.test('failing suite in renderer', () =>
+    spark(`-r ${F.test('suite-throws')}`)
+      .then(assertErrorCode))
+
+  await t.test('failing suite is reported by sparks', () =>
+    spark('-R sparks', F.test('suite-throws'))
+      .then(({ stdout }) => {
+        assert.match(stdout, /✶/)
+        assert.match(stdout, /broken suite/)
+        assert.match(stdout, /suite body failed/)
+        assert.match(stdout, /1 pass {3}✶ 1 fail/)
+      }))
+
+  await t.test('failing suite is counted by beamline', () =>
+    spark('-R beam', F.test('suite-throws'))
+      .then(({ stdout }) => {
+        assert.match(stdout, /✶ 1 fail/)
+        assert.match(stdout, /^ +✶ broken suite \(.+\)$\n(?:.*\n)*^ +│ 1 pass/m)
+      }))
 })
 
 test('console output', async (t) => {
