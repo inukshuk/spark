@@ -307,6 +307,36 @@ test('renderer isolation', async (t) => {
       }))
 })
 
+test('tap error details', async (t) => {
+  function assertDetails ({ code, stdout }) {
+    assert.ok(code > 0)
+    assert.match(stdout, /^ {2}failureType: 'testCodeFailure'$/m)
+    assert.match(stdout, /^ {2}error: \|-\n {4}Expected values to be strictly equal/m)
+    assert.match(stdout, /^ {2}code: 'ERR_ASSERTION'$/m)
+    assert.match(stdout, /^ {2}name: 'AssertionError'$/m)
+    assert.match(stdout, /^ {2}expected: 2$/m)
+    assert.match(stdout, /^ {2}actual: 1$/m)
+    assert.match(stdout, /^ {2}operator: 'strictEqual'$/m)
+    assert.match(stdout, /^ {2}stack: \|-\n {4}.*assertion\.test\.js:5/m)
+    assert.doesNotMatch(stdout, /^ {2}(message|cause):/m)
+  }
+
+  await t.test('in main process', () =>
+    spark('-R tap', F.test('assertion'))
+      .then(assertDetails))
+
+  await t.test('in renderer', () =>
+    spark(`-r ${F.test('assertion')} -R tap`)
+      .then(assertDetails))
+
+  await t.test('renderer failure', () =>
+    spark('-r nonexistent.test.js -R tap')
+      .then(({ stdout }) => {
+        assert.match(stdout, /^ {2}error: '\[\d+\]: exited/m)
+        assert.doesNotMatch(stdout, /null:/)
+      }))
+})
+
 test('--reporter with multiple destinations', async () => {
   let tmp = join(tmpdir(), `spark-test-${process.pid}.txt`)
   try {
