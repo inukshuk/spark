@@ -156,6 +156,13 @@ test('error handling', async (t) => {
     spark(`-r ${F.test('rejection')}`)
       .then(assertErrorCode))
 
+  await t.test('uncaught exception with isolation none', () =>
+    spark('-R tap', F.test('uncaught'))
+      .then(({ code, stdout }) => {
+        assert.ok(code > 0)
+        assert.match(stdout, /^ok \d+ - runs after$/m)
+      }))
+
   await t.test('renderer process crash', () =>
     spark(`-r ${F.test('crash')}`)
       .then(assertErrorCode))
