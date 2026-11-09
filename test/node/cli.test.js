@@ -107,6 +107,10 @@ test('--preload', async (t) => {
     spark(`-r ${F.test('preload')} ${preloads} -R tap`)
       .then(assertPreloaded))
 
+  await t.test('package name', () =>
+    spark(`--preload spark-chamber/config ${preloads} -R tap`, F.test('preload'))
+      .then(assertPreloaded))
+
   await t.test('bad module path', () =>
     spark(['--preload', 'nonexistent.js'], F.test('cli'))
       .then(({ code, stderr }) => {
