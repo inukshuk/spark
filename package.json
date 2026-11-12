@@ -7,7 +7,9 @@
   "exports": {
     ".": "./lib/spark.js",
     "./config": "./lib/config.js",
-    "./init": "./lib/init.js"
+    "./init": "./lib/init.js",
+    "./reporters/beamline": "./lib/reporters/beamline.js",
+    "./reporters/sparks": "./lib/reporters/sparks.js"
   },
   "files": [
     "bin",
