@@ -66,6 +66,7 @@ test('--ui', async (t) => {
       .then(({ code, stdout }) => {
         assert.equal(code, 0)
         assert.match(stdout, /ok 1 - works/)
+        assert.match(stdout, /ok 2 - runs setup before each test/)
       }))
 
   await t.test('bdd in main and renderer', () =>
@@ -79,7 +80,7 @@ test('--ui', async (t) => {
     spark(`-r ${F.test('tdd')} --ui tdd -R tap ${F.test('tdd')}`)
       .then(({ code, stdout }) => {
         assert.equal(code, 0)
-        assert.match(stdout, /# tests 2/)
+        assert.match(stdout, /# tests 4/)
       }))
 })
 

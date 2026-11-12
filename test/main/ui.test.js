@@ -15,7 +15,7 @@ test('tdd with process isolation', () =>
     files: [F.test('tdd')],
     isolation: 'process',
     ui: 'tdd'
-  }), ['works']))
+  }), ['works', 'runs setup before each test']))
 
 test('bdd in renderer', () =>
   assertTestNames(runRenderer({
