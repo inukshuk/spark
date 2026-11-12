@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { join } from 'node:path'
+import process from 'node:process'
 import { describe, it } from 'node:test'
+import { pathToFileURL } from 'node:url'
 import { run, runMain, runRenderer } from '../../lib/spark.js'
 import { F } from '../support/fixtures.js'
 import { collectCoverage, coveredFunctions } from '../support/stream.js'
@@ -67,6 +71,45 @@ describe('coverage', () => {
 
       let covered = coveredFunctions(coverages, F.js('chamber'))
       assert.ok(covered.has('detect'), 'detect should be covered')
+    })
+
+    it('collects coverage of files compiled on load', async () => {
+      let coverages = await collectCoverage(runRenderer({
+        files: [F.join('compile/badge.test.js')],
+        preload: [F.join('compile/hooks.js')],
+        coverage: true,
+        coverageExcludeGlobs
+      })[0])
+
+      let covered = coveredFunctions(coverages, F.join('compile/badge.jsx'))
+      assert.ok(covered.has('badge'), 'badge should be covered')
+    })
+
+    it('writes raw coverage with source maps to NODE_V8_COVERAGE', {
+      skip: !process.env.NODE_V8_COVERAGE && 'requires NODE_V8_COVERAGE at startup'
+    }, async () => {
+      let start = Date.now()
+
+      await collectCoverage(runRenderer({
+        files: [F.join('compile/badge.test.js')],
+        preload: [F.join('compile/hooks.js')],
+        coverage: true,
+        coverageExcludeGlobs
+      })[0])
+
+      let cache = Object.assign({}, ...readdirSync(process.env.NODE_V8_COVERAGE)
+        .filter(name => name.endsWith('.json'))
+        .map(name => join(process.env.NODE_V8_COVERAGE, name))
+        .filter(path => statSync(path).mtimeMs >= start)
+        .map(path => JSON.parse(readFileSync(path, 'utf8'))['source-map-cache']))
+
+      let url = pathToFileURL(F.join('compile/badge.jsx')).href
+      let entry = cache[url]
+      let lines = readFileSync(F.join('compile/badge.jsx'), 'utf8').split('\n')
+
+      assert.deepEqual(entry.data.sources, [url])
+      // The compiled source: header + original + sourceMappingURL comment.
+      assert.equal(entry.lineLengths.length, 2 + lines.length + 1)
     })
 
     it('respects coverageExcludeGlobs', async () => {
