@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
 import process from 'node:process'
 import { test } from 'node:test'
+import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 import { F } from '../support/fixtures.js'
 import { sparkBin } from '../support/process.js'
@@ -23,8 +24,9 @@ for (let sourceMaps of [true, false]) {
       ...flags,
       '--test',
       '--experimental-test-coverage',
-      '--import', hooks,
-      '--test-reporter', reporter,
+      // URLs, because Windows paths are not valid specifiers here.
+      '--import', pathToFileURL(hooks).href,
+      '--test-reporter', pathToFileURL(reporter).href,
       files
     ], { env })
 
